@@ -1,72 +1,55 @@
-// SelectFilter.js
-import React from 'react';
-import { useState, useRef, useEffect } from 'react';
-const SelectFilter = ({ title, options, index }) => {
-    // Your logic for the select filter component goes here
+// Filters.js
+import React,{useState} from 'react';
+import SelectFilter from './SelectFilter';
+import SubmitButton from './SubmitButton';
+import Data from '../sample_data/sample_data.json'
 
-    const [showFilter, setShowFilter] = useState(false)
-    // const [activeIndex, setActiveIndex] = useState(-1);
-    const activeRef = useRef(0)
+const Filters = ({onStateChange}) => {
+  const [activeField, setActiveField] = useState(null);
+  const [checkedValues, setCheckedValues] = useState([]);
 
-    const handleShowFilter = (e) => {
-        console.log(e.target.id, "e")
-        if (e.target.id == activeRef.current.id) {
-            console.log('yes');
-            setShowFilter(!showFilter)
-        }
+  const handleShowFilter = (index) => {
+    setActiveField((prevActiveField) => (prevActiveField === index ? null : index));
+  };
 
-        else {
-            setShowFilter(false)
-        }
-    }
+console.log(activeField);
+  // Your logic for the Filters section goes here
 
-    return (
-        <div className="select-filter">
-            {/* Your select filter UI */}
-            <div className="select-filter">
-                <div id={`${index}`} className="selection-input" onClick={(e) => { handleShowFilter(e) }}>
-                    <span className="select-placeholder ">{title}</span>
-                    <ul className="selected-options d-none">
-                        <li>Studio</li>
-                        <li>1BR</li>
-                        <li>2BR</li>
-                    </ul>
-                </div>
-                {showFilter && <div ref={activeRef} id={`${index}`} className='filter-popup'>
-                    <div className="filter-popup-wrap">
-                        <p>{title}</p>
-                        <ul className="filters-options">
-                            {options.map((option, index) => {
-                                return (
-                                    <li key={index}>
-                                        <label className="input-group">{option}
-                                            <input type="checkbox" />
-                                            <span className="checkmark"></span>
-                                        </label>
-                                    </li>
-                                )
-                            })}
-                        </ul>
-                        <div className="filters-btn">
+  const filters = Data.filters
 
-                            <div className="primary-anchor large-btn">
-                                <button className="w-100 outline-btn" type="reset">
-                                    <span>RESET</span>
-                                </button>
-                            </div>
-                            <div className="primary-anchor large-btn">
-                                <button className="w-100">
-                                    <span>APPLY</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>}
+  const handleChildStateChange = (newState) => {
+    setCheckedValues(newState);
+  };
 
+  // console.log('checked======',checkedValues);
 
-            </div>
+  const handleSubmit=(e)=>{
+    e.preventDefault();
+    onStateChange(checkedValues);
+
+  }
+
+  return (
+    <section className="section filters">
+      <div className="container">
+        <div className="filter-wrap">
+          {filters.map((filter, index) => {
+            return (
+              <div key={index}  >
+                <SelectFilter onStateChange={handleChildStateChange} index={filter.id} handleShowFilter={handleShowFilter} title={filter.title} activeField={activeField} options={filter.options} />
+              </div>
+            )
+          })}
+
+<div className="primary-anchor">
+      <button type='submit' onClick={(e)=>handleSubmit(e)} className="w-100">
+        <span>SUBMIT</span>
+      </button>
+    </div>
         </div>
-    );
+      </div>
+    </section>
+  );
 };
 
-export default SelectFilter;
+export default Filters;
